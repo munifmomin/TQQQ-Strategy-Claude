@@ -1,0 +1,4 @@
+tqqq_bvt/__pycache__/
+*.pyc
+data_cache.parquet
+__pycache__/
