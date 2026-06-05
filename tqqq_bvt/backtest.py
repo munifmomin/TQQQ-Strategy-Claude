@@ -49,7 +49,7 @@ def run_backtest(allocations: pd.DataFrame,
 
     # Current holdings: {ticker: shares}
     holdings: dict[str, float] = {}
-    cash = 0.0
+    cash = initial_capital   # all capital starts as uninvested cash
     portfolio_value = initial_capital
 
     # Pre-compute target weights for each day as (target, weight_in_target, weight_in_bil)
