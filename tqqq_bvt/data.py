@@ -49,14 +49,19 @@ def align_to_spy(prices: pd.DataFrame) -> pd.DataFrame:
     spy_idx = prices["SPY"].dropna().index
     aligned = prices.reindex(spy_idx)
 
+    # Forward-fill prices for tickers that have gaps on SPY calendar days
+    # (e.g. leveraged ETFs that started later, or occasional data gaps).
+    # We report the count BEFORE ffill so the user knows gaps exist.
     for col in aligned.columns:
         n_missing = aligned[col].isna().sum()
         if n_missing > 0:
-            print(f"  [DATA] {col}: {n_missing} missing days on SPY calendar")
+            print(f"  [DATA] {col}: {n_missing} missing days on SPY calendar (will forward-fill)")
         total_days = len(aligned[col].dropna())
         if total_days < 252:
             print(f"  [WARN] {col} has only {total_days} trading days — less than 1 year")
 
+    # Forward-fill then back-fill to handle leading NaNs (tickers with later start dates)
+    aligned = aligned.ffill().bfill()
     return aligned
 
 

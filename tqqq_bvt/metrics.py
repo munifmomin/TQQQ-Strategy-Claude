@@ -9,11 +9,19 @@ import pandas as pd
 
 
 def total_return(equity: pd.Series) -> float:
+    equity = equity.dropna()
+    if len(equity) < 2:
+        return 0.0
     return (equity.iloc[-1] / equity.iloc[0] - 1) * 100
 
 
 def cagr(equity: pd.Series) -> float:
+    equity = equity.dropna()
+    if len(equity) < 2:
+        return 0.0
     years = (equity.index[-1] - equity.index[0]).days / 365.25
+    if years <= 0:
+        return 0.0
     return ((equity.iloc[-1] / equity.iloc[0]) ** (1 / years) - 1) * 100
 
 
@@ -24,8 +32,13 @@ def annual_vol(equity: pd.Series) -> float:
 
 def max_drawdown(equity: pd.Series) -> tuple[float, int, int]:
     """Returns (mdd_pct, peak_to_trough_days, days_to_recovery)."""
+    equity = equity.dropna()
+    if len(equity) < 2:
+        return 0.0, 0, 0
     roll_max = equity.cummax()
     dd = equity / roll_max - 1
+    if dd.isna().all():
+        return 0.0, 0, 0
     mdd = dd.min() * 100
 
     trough_idx = dd.idxmin()
